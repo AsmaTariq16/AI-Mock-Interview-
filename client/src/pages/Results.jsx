@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from '../context/RouterContext';
+import { API_BASE } from '../context/AuthContext';
 
 export default function Results() {
   const { getAuthHeaders } = useAuth();
@@ -20,7 +21,7 @@ export default function Results() {
 
     const fetchReport = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/v1/interview/${sessionId}`, {
+        const res = await fetch(`${API_BASE}/api/v1/interview/${sessionId}`, {
           headers: getAuthHeaders()
         });
         const data = await res.json();
