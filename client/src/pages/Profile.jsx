@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from '../context/RouterContext';
+import { API_BASE } from '../context/AuthContext';
 
 export default function Profile() {
   const { user, logout, getAuthHeaders } = useAuth();
@@ -27,7 +28,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/v1/interview/history', {
+        const res = await fetch(`${API_BASE}/api/v1/interview/history`, {
           headers: getAuthHeaders()
         });
         const data = await res.json();
