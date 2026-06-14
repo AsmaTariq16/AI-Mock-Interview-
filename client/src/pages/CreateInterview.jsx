@@ -82,7 +82,7 @@ export default function CreateInterview() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/v1/interview/start', {
+      const res = await fetch(`${API_BASE}/api/v1/interview/start`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
