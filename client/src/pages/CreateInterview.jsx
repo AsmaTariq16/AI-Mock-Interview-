@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useRouter } from '../context/RouterContext';
-
+import { useAuth, API_BASE } from '../context/AuthContext';
 export default function CreateInterview() {
   const { getAuthHeaders } = useAuth();
   const { navigate } = useRouter();
