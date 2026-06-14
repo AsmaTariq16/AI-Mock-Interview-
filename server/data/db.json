@@ -1,0 +1,111 @@
+{
+  "users": [
+    {
+      "_id": "nyxqpaje0qxj2zjppyfd",
+      "name": "Asma",
+      "email": "asma@gmail.com",
+      "password": "$2a$10$LO6gfo8yjiqDx4U0H6ujN.jfIpO6BpYFoIwtIQfE4FoUE4J09gCau",
+      "createdAt": "2026-06-01T14:10:08.471Z"
+    }
+  ],
+  "interviews": [
+    {
+      "_id": "efi44pld1hfxxn9i18zxut",
+      "userId": "nyxqpaje0qxj2zjppyfd",
+      "role": "MERN Stack Developer",
+      "level": "Intermediate",
+      "experience": "Fresher",
+      "focus": "Fullstack",
+      "difficulty": "Easy",
+      "questionCount": 5,
+      "interviewType": "Technical",
+      "questions": [
+        {
+          "questionText": "Explain Cors (Cross-Origin Resource Sharing) and how to resolve CORS errors in production.",
+          "answerText": "## What is CORS (Cross-Origin Resource Sharing)\n\nCORS is a browser security rule that controls whether a web app running on one domain can access resources from another domain.\n\nExample:\n\n* Frontend: `https://app.example.com`\n* Backend API: `https://api.example.com`\n\nThese are different origins, so the browser blocks requests unless the backend explicitly allows them.\n\n---\n\n## Why CORS exists\n\nBrowsers enforce the **Same-Origin Policy**:\n\n* Prevents a website from silently calling another domain’s API\n* Protects users from malicious scripts stealing data\n\nCORS is the controlled exception to this rule.\n\n---\n\n## What triggers a CORS error\n\nA CORS error happens when:\n\n* Frontend calls backend from a different domain/port\n* Backend does not include proper CORS headers\n* Preflight request (OPTIONS) fails\n\nTypical error:\n\n```\nAccess to fetch at 'https://api.site.com' from origin 'https://site.com'\nhas been blocked by CORS policy\n```\n\n---\n\n## How CORS works (simple flow)\n\n1. Browser sends request with `Origin` header\n2. Backend checks if origin is allowed\n3. Backend responds with headers like:\n\n```\nAccess-Control-Allow-Origin: https://site.com\nAccess-Control-Allow-Methods: GET, POST\nAccess-Control-Allow-Headers: Content-Type\n```\n\n4. Browser allows or blocks response based on these headers\n\n---\n\n## Fixing CORS in backend (production-ready)\n\n### 1. Node.js (Express)\n\n```js\nimport cors from \"cors\";\n\napp.use(cors({\n  origin: \"https://your-frontend-domain.com\",\n  credentials: true\n}));\n```\n\n---\n\n### 2. Allow multiple environments\n\n```js\nconst allowedOrigins = [\n  \"http://localhost:5173\",\n  \"https://your-app.com\"\n];\n\napp.use(cors({\n  origin: function (origin, callback) {\n    if (!origin || allowedOrigins.includes(origin)) {\n      callback(null, true);\n    } else {\n      callback(new Error(\"Not allowed by CORS\"));\n    }\n  },\n  credentials: true\n}));\n```\n\n---\n\n### 3. FastAPI (Python backend)\n\n```python\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"https://your-app.com\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n```\n\n---\n\n## Handling preflight (OPTIONS request)\n\nBrowsers send a preflight request when:\n\n* Using POST/PUT/DELETE\n* Sending custom headers\n* Using JSON content-type\n\nBackend must respond correctly:\n\n* Allow OPTIONS method\n* Return proper headers\n\nMost CORS libraries handle this automatically.\n\n---\n\n## Production best practices\n\n### 1. Never use wildcard in production\n\nBad:\n\n```\nAccess-Control-Allow-Origin: *\n```\n\nGood:\n\n```\nhttps://yourdomain.com\n```\n\n---\n\n### 2. Always enable credentials carefully\n\nIf using cookies or auth:\n\n```\nAccess-Control-Allow-Credentials: true\n```\n\nThen you cannot use `*` as origin.\n\n---\n\n### 3. Use environment-based config\n\n```js\nconst origin =\n  process.env.NODE_ENV === \"production\"\n    ? \"https://yourdomain.com\"\n    : \"http://localhost:5173\";\n```\n\n---\n\n### 4. Handle API gateway / reverse proxy\n\nIf using Nginx:\n\n```nginx\nadd_header Access-Control-Allow-Origin https://yourdomain.com;\nadd_header Access-Control-Allow-Methods \"GET, POST, OPTIONS\";\n```\n\n---\n\n## Common mistakes\n\n* Backend not enabling CORS at all\n* Mismatch between frontend URL and allowed origin\n* Using cookies without `credentials: true`\n* Forgetting OPTIONS handling\n* Hardcoding localhost in production\n\n---\n\n## Simple mental model\n\nCORS is not a backend bug.\n\nIt is the browser saying:\n\n> “This website is trying to talk to another domain. I need permission first.”\n\n---\n\nIf you want, I can:\n\n* fix CORS specifically in your MGX project (FastAPI + web-sdk setup)\n* or show exactly where your current project might break in production deployment",
+          "score": 10,
+          "feedback": "Excellent response! You explained the concepts clearly with appropriate technical terminology.",
+          "durationSeconds": 80
+        },
+        {
+          "questionText": "How do you ensure password security in database storage? Explain salt, rounds, and hashing algorithms.",
+          "answerText": "1. Hashing (core idea)\n\nHashing converts a password into a fixed-length string:\n\npassword → hash function → hashed output\n\nExample:\n\nPassword:  mypassword123\nHash:      $2b$10$N9qo8uLOickgx2ZMRZoMye...\n\nKey properties:\n\nOne-way (cannot be reversed)\nSame input always produces same output\nSmall change in input completely changes hash\n2. Why hashing is not enough alone\n\nIf attackers precompute hashes (rainbow tables), they can crack weak passwords.\n\nSo we add salt + slow hashing algorithms.\n\n3. Salt (critical concept)\n\nA salt is a random string added before hashing:\n\npassword + salt → hash\n\nExample:\n\npassword: admin123\nsalt:     X7k@91\ninput:    admin123X7k@91 → hash\nWhy salt is important:\nPrevents identical passwords from having same hash\nBreaks rainbow table attacks\nMakes each user’s hash unique\n\nImportant:\n\nSalt is stored in the database alongside hash\nIt is not secret\n4. Rounds (work factor)\n\nRounds = how many times hashing is repeated.\n\nInstead of hashing once:\n\nhash(password + salt)\n\nWe do:\n\nhash(hash(hash(... password ...)))\nWhy it matters:\nMakes brute-force attacks slow\nIncreases computational cost for attackers\n\nExample:\n\n10,000 rounds = slower login computation\nAttackers must also spend 10,000x effort per guess\n5. Secure hashing algorithms (important)\n\nYou should NEVER use:\n\nMD5 ❌\nSHA1 ❌\nSHA256 alone ❌ (too fast)\n\nInstead use:\n\n✔ bcrypt (most common)\nBuilt-in salt\nAdjustable rounds (cost factor)\nVery secure for passwords\n✔ Argon2 (modern best choice)\nWinner of password hashing competition\nResistant to GPU attacks\nMemory-hard (very secure)\n✔ scrypt (also strong)\nMemory intensive\nGood against hardware attacks\n6. Example with bcrypt (Node.js)\nimport bcrypt from \"bcrypt\";\n\nconst password = \"mypassword123\";\n\n// Hashing (registration)\nconst hash = await bcrypt.hash(password, 10); // 10 = rounds\n\n// Saving to DB\n// store hash only\n\n// Verification (login)\nconst isValid = await bcrypt.compare(password, hash);\n7. Example concept in database\n\nUser table:\n\nid | email | password_hash\n\nStored value:\n\n$2b$10$EixZaYVK1fsbw1ZfbX3OXe...\n\nNo raw password stored.",
+          "score": 10,
+          "feedback": "Excellent response! You explained the concepts clearly with appropriate technical terminology.",
+          "durationSeconds": 45
+        },
+        {
+          "questionText": "What are WebSockets and how do they differ from HTTP polling?",
+          "answerText": "WebSockets\n\nWebSockets are a communication protocol that creates a persistent, two-way connection between a client (browser) and a server.\n\nOnce the connection is established:\n\nBoth client and server can send messages anytime\nNo need to repeatedly request data\nConnection stays open until closed\nHow WebSockets work\nClient sends a WebSocket handshake over HTTP\nServer upgrades the connection\nA persistent connection is created\nData flows both directions in real time\n\nExample use cases:\n\nChat apps\nLive notifications\nGaming\nReal-time dashboards\nAI interview live feedback systems\nHTTP Polling (traditional method)\n\nPolling means the client repeatedly asks the server for updates:\n\nClient → \"Any new data?\"\nServer → \"No\"\n(wait 5 sec)\nClient → \"Any new data?\"\nServer → \"Yes\"\n\nThere are two main types:\n\nShort polling: frequent requests\nLong polling: server waits until data is available\nKey differences\n1. Connection type\nWebSockets: single persistent connection\nPolling: repeated new HTTP requests\n2. Real-time performance\nWebSockets: instant updates\nPolling: delayed based on interval\n3. Server load\nWebSockets: low overhead after connection\nPolling: high load due to repeated requests\n4. Data flow\nWebSockets: bidirectional (client ↔ server)\nPolling: one-way per request (client → server → client)\n5. Efficiency\nWebSockets: efficient for continuous updates\nPolling: inefficient for real-time apps\nSimple analogy\nWebSockets: like a phone call (live conversation)\nPolling: like sending repeated letters asking “any update?”\nWhen to use which\nUse WebSockets when:\nReal-time interaction is needed\nChat, live updates, AI responses streaming\nUse Polling when:\nData updates are rare\nSimplicity is more important than speed",
+          "score": 10,
+          "feedback": "Excellent response! You explained the concepts clearly with appropriate technical terminology.",
+          "durationSeconds": 39
+        },
+        {
+          "questionText": "How would you structure a standard git-based release workflow in a team of 5 developers?",
+          "answerText": "1. Core branch structure\nmain\nProduction-ready code\nAlways stable\nEvery commit here is a release\ndevelop\nIntegration branch\nAll features merge here first\nUsed for staging/testing\nfeature/*\nIndividual feature work\nCreated from develop\n\nExample:\n\nfeature/auth-system\nfeature/interview-engine\nrelease/*\nPreparation for production\nFinal testing, bug fixes, version bump\nhotfix/*\nEmergency fixes from production\nBranches from main\n2. Workflow steps\nStep 1: Feature development\n\nEach developer:\n\ngit checkout develop\ngit checkout -b feature/interview-engine\n\nWork → commit → push:\n\ngit add .\ngit commit -m \"Add interview engine logic\"\ngit push origin feature/interview-engine\nStep 2: Code review (Pull Request)\nFeature branch → develop\nAt least 1–2 reviewers approve\nCI runs tests\n\nMerge after approval.\n\nStep 3: Integration testing\n\nAll features are merged into:\n\ndevelop\n\nThis branch is:\n\ntested\ndebugged\nverified as a full system\nStep 4: Release preparation\n\nWhen ready for production:\n\ngit checkout develop\ngit checkout -b release/v1.0.0\n\nIn release branch:\n\nbug fixes only\nno new features\nversion updates\nStep 5: Production release\n\nAfter final approval:\n\ngit checkout main\ngit merge release/v1.0.0\ngit tag v1.0.0\ngit push origin main --tags\n\nThen merge back:\n\ngit checkout develop\ngit merge main\nStep 6: Hotfix process\n\nIf production breaks:\n\ngit checkout main\ngit checkout -b hotfix/login-fix\n\nFix → test → merge:\n\ngit checkout main\ngit merge hotfix/login-fix\ngit tag v1.0.1\n\nAlso merge into develop.\n\n3. Team role distribution (5 developers)\nDev 1–4\nWork on feature branches\nOwn specific modules\nDev 5 (Lead / Integrator)\nControls merges into develop\nReviews PRs\nManages releases\nHandles conflicts\n4. CI/CD pipeline (recommended)\n\nOn every PR:\n\nlint check\nunit tests\nbuild check\n\nOn main:\n\nauto deploy to production\n5. Branching diagram\nmain\n  ↑\nrelease/v1.0.0\n  ↑\ndevelop\n ↑   ↑   ↑\nfeature/* feature/* feature/*",
+          "score": 10,
+          "feedback": "Excellent response! You explained the concepts clearly with appropriate technical terminology.",
+          "durationSeconds": 64
+        },
+        {
+          "questionText": "Tell me about a time you had a technical disagreement with a team member. How did you resolve it?",
+          "answerText": "Sample Answer\n\nDuring a project, we had a disagreement about how to handle authentication in our application. One team member preferred storing session-based authentication, while I suggested using JWT-based authentication for better scalability in a distributed setup.\n\nSituation\n\nWe were building a full-stack web app with multiple APIs and a React frontend. Authentication design was critical because it would affect scalability and security.\n\nTask\n\nWe needed to agree on a single approach quickly so development would not stall.\n\nAction\n\nInstead of pushing my opinion, I asked the team member to explain their reasoning in detail. They highlighted concerns about token security and logout handling in JWT.\n\nI then shared my perspective, focusing on:\n\nStateless architecture benefits\nScalability for future microservices\nIndustry standard practices\n\nWe also compared both approaches with real trade-offs. To resolve the security concern, I proposed adding:\n\nshort-lived access tokens\nrefresh tokens with secure storage\nproper token invalidation strategy\nResult\n\nWe agreed on a hybrid JWT-based approach with refresh tokens. It improved scalability while addressing security concerns. The discussion also improved team alignment and we documented the decision to avoid confusion later.",
+          "score": 10,
+          "feedback": "Excellent response! You explained the concepts clearly with appropriate technical terminology.",
+          "durationSeconds": 53
+        }
+      ],
+      "status": "completed",
+      "overallScore": 100,
+      "finalFeedback": "The candidate completed a comprehensive mock interview for the position of MERN Stack Developer (Intermediate level). Throughout the session, the candidate answered 5 questions exploring various facets of Fullstack. With a cumulative score of 100%, the candidate has demonstrated a solid grip on the primary technological frameworks required. Overall, they show great promise and would benefit from targeting the detailed improvement steps outlined in this report.",
+      "recommendation": "Strong Hire",
+      "createdAt": "2026-06-01T14:11:27.306Z",
+      "skillBreakdown": {
+        "React": 10,
+        "Node.js": 10,
+        "Express": 10,
+        "MongoDB": 9,
+        "Communication": 10
+      },
+      "strengths": [
+        "Demonstrated familiarity with core MERN Stack Developer concepts.",
+        "Structured and logical explanation style for Fullstack topics."
+      ],
+      "weaknesses": [
+        "Could provide more code snippets or specific architectural examples in explanations.",
+        "Potential gaps in handling complex failure scenarios or edge cases under pressure."
+      ],
+      "suggestions": [
+        "Study advanced patterns in MERN Stack Developer including state routing and error barriers.",
+        "Practice coding under timed environments to build comfort with instant technical articulation.",
+        "Read official docs regarding system design patterns and security integrations."
+      ]
+    },
+    {
+      "_id": "ex6lwi98s6ap95c2v8ust",
+      "userId": "nyxqpaje0qxj2zjppyfd",
+      "role": "MERN Stack Developer",
+      "level": "Beginner",
+      "experience": "Fresher",
+      "focus": "Fullstack",
+      "difficulty": "Easy",
+      "questionCount": 5,
+      "interviewType": "HR / Behavioral",
+      "questions": [
+        {
+          "questionText": "What is a REST API? Describe the main HTTP methods.",
+          "answerText": "",
+          "score": 0,
+          "feedback": "",
+          "durationSeconds": 0
+        }
+      ],
+      "status": "in-progress",
+      "overallScore": 0,
+      "finalFeedback": "",
+      "recommendation": "",
+      "createdAt": "2026-06-02T05:29:20.501Z"
+    }
+  ]
+}
