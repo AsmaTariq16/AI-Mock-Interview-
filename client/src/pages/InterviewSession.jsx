@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from '../context/RouterContext';
+import { API_BASE } from '../context/AuthContext';
 
 export default function InterviewSession() {
   const { getAuthHeaders } = useAuth();
@@ -45,7 +46,7 @@ export default function InterviewSession() {
 
     const fetchSession = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/v1/interview/${sessionId}`, {
+        const res = await fetch(`${API_BASE}/api/v1/interview/${sessionId}`, {
           headers: getAuthHeaders()
         });
         const data = await res.json();
@@ -248,7 +249,7 @@ export default function InterviewSession() {
     setError('');
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/interview/${sessionId}/answer`, {
+      const res = await fetch(`${API_BASE}/api/v1/interview/${sessionId}/answer`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
