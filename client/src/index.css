@@ -1427,6 +1427,7 @@ body {
 }
 
 .app-content .main-content {
+  overflow: hidden;
   max-width: none;
   margin: 0;
   flex: 1;
