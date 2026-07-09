@@ -1825,6 +1825,9 @@ body {
     font-size: 0.95rem;
     min-width: max-content;
   }
+  .glass-panel {
+    width: 80%;
+  }
 }
 
 @media (min-width: 900px) {
