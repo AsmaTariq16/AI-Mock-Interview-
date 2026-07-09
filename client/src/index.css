@@ -340,8 +340,8 @@ body {
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  padding: 1.25rem 2.5rem;
+  justify-content: space-between;
+  padding: 1.25rem .5rem;
   background: rgba(250, 248, 244, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
