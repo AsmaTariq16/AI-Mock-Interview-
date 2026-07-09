@@ -286,6 +286,7 @@ body {
 
 /* Glassmorphism Panels & Cards */
 .glass-panel {
+  overflow: auto;
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -323,6 +324,7 @@ body {
 }
 
 .main-content {
+  overflow: hidden;
   flex: 1;
   width: 100%;
   max-width: 1200px;
